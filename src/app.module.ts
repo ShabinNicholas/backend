@@ -10,18 +10,32 @@ import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    // TypeOrmModule.forRootAsync({
+    //   inject: [ConfigService],
+    //   useFactory: (config: ConfigService) => ({
+    //     type: 'postgres',
+    //     host: config.get('DB_HOST', 'localhost'),
+    //     port: config.get<number>('DB_PORT', 5432),
+    //     username: config.get('DB_USERNAME', 'postgres'),
+    //     password: config.get('DB_PASSWORD', 'postgres'),
+    //     database: config.get('DB_NAME', 'staffdb'),
+    //     entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    //     synchronize: true,
+    //     logging: false,
+    //   }),
+    // }),
+
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        host: config.get('DB_HOST', 'localhost'),
-        port: config.get<number>('DB_PORT', 5432),
-        username: config.get('DB_USERNAME', 'postgres'),
-        password: config.get('DB_PASSWORD', 'postgres'),
-        database: config.get('DB_NAME', 'staffdb'),
+        url: config.get<string>('DATABASE_URL'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true,
+        synchronize: true, // ⚠️ change later in production
         logging: false,
+        ssl: {
+          rejectUnauthorized: false,
+        },
       }),
     }),
     AuthModule,
@@ -31,4 +45,4 @@ import { AuthModule } from './auth/auth.module';
     ReportsModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
